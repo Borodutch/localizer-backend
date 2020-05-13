@@ -78,4 +78,56 @@ export default class {
     }
     ctx.status = 200
   }
+
+  @Post('/', checkPassword)
+  async selectVariant(ctx: Context) {
+    const { key, id } = ctx.request.body
+    if (!key || !id) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findById(id)
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    const variantToSelect = localization.variants.find((v: any) => v._id === id)
+    if (!variantToSelect) {
+      return ctx.throw(404)
+    }
+    for (const variant of localization.variants) {
+      if (variant.language === variantToSelect.language) {
+        variant.selected = false
+      }
+    }
+    variantToSelect.selected = true
+    await localization.save()
+    ctx.status = 200
+  }
+
+  @Post('/localization', checkPassword)
+  async postLocalization(ctx: Context) {
+    const { key, text, language, username } = ctx.request.body
+    if (!key || !text || !language) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findOne({ key })
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    // Check if this variant already exists
+    for (const variant of localization.variants.filter(
+      (v) => v.language === language
+    )) {
+      if (variant.text === text) {
+        return 403
+      }
+    }
+    localization.variants.push({
+      username,
+      language,
+      text,
+      selected: false,
+    })
+    await localization.save()
+    ctx.status = 200
+  }
 }

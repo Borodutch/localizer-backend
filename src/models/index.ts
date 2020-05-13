@@ -10,4 +10,4 @@ mongoose.set('useCreateIndex', true)
 mongoose.set('useFindAndModify', false)
 
 // Export models
-export * from './user'
+export * from './localization'

@@ -40,6 +40,7 @@ export default class {
               language,
               text: newLocalization[language],
               selected: true,
+              createdAt: new Date(),
             }
           }),
         }).save()
@@ -66,6 +67,9 @@ export default class {
               language,
               text: newLocalization[language],
               selected: true,
+              createdAt: new Date(),
+              upvotes: 0,
+              downvotes: 0,
             })
           }
           // Add tags if needed
@@ -124,6 +128,92 @@ export default class {
     ctx.status = 200
   }
 
+  @Post('/upvote')
+  async upvoteVariant(ctx: Context) {
+    const { key, id } = ctx.request.body
+    if (!key || !id) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findOne({ key })
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    for (const variant of localization.variants) {
+      if ((variant as any)._id.toString() === id) {
+        variant.upvotes++
+        break
+      }
+    }
+    await localization.save()
+    ctx.status = 200
+  }
+
+  @Post('/upvote/remove')
+  async removeUpvoteVariant(ctx: Context) {
+    const { key, id } = ctx.request.body
+    if (!key || !id) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findOne({ key })
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    for (const variant of localization.variants) {
+      if ((variant as any)._id.toString() === id) {
+        variant.upvotes--
+        if (variant.upvotes < 0) {
+          variant.upvotes = 0
+        }
+        break
+      }
+    }
+    await localization.save()
+    ctx.status = 200
+  }
+
+  @Post('/downvote')
+  async downvoteVariant(ctx: Context) {
+    const { key, id } = ctx.request.body
+    if (!key || !id) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findOne({ key })
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    for (const variant of localization.variants) {
+      if ((variant as any)._id.toString() === id) {
+        variant.downvotes++
+        break
+      }
+    }
+    await localization.save()
+    ctx.status = 200
+  }
+
+  @Post('/downvote/remove')
+  async removeDownvoteVariant(ctx: Context) {
+    const { key, id } = ctx.request.body
+    if (!key || !id) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findOne({ key })
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    for (const variant of localization.variants) {
+      if ((variant as any)._id.toString() === id) {
+        variant.downvotes--
+        if (variant.downvotes < 0) {
+          variant.downvotes = 0
+        }
+        break
+      }
+    }
+    await localization.save()
+    ctx.status = 200
+  }
+
   @Post('/localization/delete', checkPassword)
   async deleteLocalization(ctx: Context) {
     const { key } = ctx.request.body
@@ -161,6 +251,9 @@ export default class {
       language,
       text,
       selected: false,
+      createdAt: new Date(),
+      upvotes: 0,
+      downvotes: 0,
     })
     await localization.save()
     ctx.status = 200

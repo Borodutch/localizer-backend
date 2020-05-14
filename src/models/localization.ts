@@ -10,6 +10,12 @@ class LocalizationVariant {
   text: string
   @prop({ required: true, default: false })
   selected: boolean
+  @prop()
+  createdAt: Date
+  @prop({ required: true, default: 0 })
+  upvotes: number
+  @prop({ required: true, default: 0 })
+  downvotes: number
 }
 
 export class Localization {
@@ -21,7 +27,7 @@ export class Localization {
   variants: LocalizationVariant[]
 
   stripped() {
-    const stripFields = ['createdAt', 'updatedAt', '__v']
+    const stripFields = ['updatedAt', '__v']
     return omit(this._doc, stripFields)
   }
 

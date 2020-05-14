@@ -79,17 +79,19 @@ export default class {
     ctx.status = 200
   }
 
-  @Post('/', checkPassword)
+  @Post('/select', checkPassword)
   async selectVariant(ctx: Context) {
     const { key, id } = ctx.request.body
     if (!key || !id) {
       return ctx.throw(403)
     }
-    const localization = await LocalizationModel.findById(id)
+    const localization = await LocalizationModel.findOne({ key })
     if (!localization) {
       return ctx.throw(404)
     }
-    const variantToSelect = localization.variants.find((v: any) => v._id === id)
+    const variantToSelect = localization.variants.find(
+      (v: any) => v._id.toString() === id
+    )
     if (!variantToSelect) {
       return ctx.throw(404)
     }
@@ -103,7 +105,38 @@ export default class {
     ctx.status = 200
   }
 
-  @Post('/localization', checkPassword)
+  @Post('/delete', checkPassword)
+  async deleteVariant(ctx: Context) {
+    const { key, id } = ctx.request.body
+    if (!key || !id) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findOne({ key })
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    localization.variants = localization.variants.filter(
+      (v: any) => v._id.toString() !== id
+    )
+    await localization.save()
+    ctx.status = 200
+  }
+
+  @Post('/localization/delete', checkPassword)
+  async deleteLocalization(ctx: Context) {
+    const { key } = ctx.request.body
+    if (!key) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findOne({ key })
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    await localization.remove()
+    ctx.status = 200
+  }
+
+  @Post('/localization')
   async postLocalization(ctx: Context) {
     const { key, text, language, username } = ctx.request.body
     if (!key || !text || !language) {

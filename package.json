@@ -12,7 +12,8 @@
     "develop": "concurrently -i -k -p \"[{name}]\" -n \"Node,TypeScript\" -c \"yellow.bold,cyan.bold\" \"yarn watch-js\" \"yarn watch-ts\"",
     "build-ts": "tsc --skipLibCheck",
     "watch-ts": "tsc -w --skipLibCheck",
-    "watch-js": "nodemon dist/app.js"
+    "watch-js": "nodemon dist/app.js",
+    "killServer": "lsof -ti:1337 | xargs kill"
   },
   "devDependencies": {
     "concurrently": "^5.2.0",

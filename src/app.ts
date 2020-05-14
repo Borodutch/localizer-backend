@@ -17,4 +17,6 @@ app.use(router.routes())
 app.use(router.allowedMethods())
 app.listen(process.env.PORT || 1337)
 
-console.log('Koa application is up and running on port 1337')
+console.log(
+  `Koa application is up and running on port ${process.env.PORT || 1337}`
+)

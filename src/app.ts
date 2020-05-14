@@ -15,6 +15,6 @@ app.use(cors({ origin: '*' }))
 app.use(bodyParser())
 app.use(router.routes())
 app.use(router.allowedMethods())
-app.listen(1337)
+app.listen(process.env.PORT || 1337)
 
 console.log('Koa application is up and running on port 1337')

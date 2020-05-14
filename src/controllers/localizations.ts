@@ -49,9 +49,6 @@ export default class {
           // Create placeholder variables for future
           let alreadyExists = false
           // Loop through the old localization variants for this language
-          console.log(
-            oldLocalization.variants.filter((v) => v.language === language)
-          )
           for (const variant of oldLocalization.variants.filter(
             (v) => v.language === language
           )) {
@@ -71,6 +68,11 @@ export default class {
               selected: true,
             })
           }
+          // Add tags if needed
+          const tags = new Set<string>()
+          oldLocalization.tags.forEach((t) => tags.add(t))
+          ctx.request.body.tags.forEach((t) => tags.add(t))
+          oldLocalization.tags = Array.from(tags)
           // Save old localization
           await oldLocalization.save()
         }

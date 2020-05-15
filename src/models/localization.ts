@@ -1,6 +1,15 @@
 import { prop, getModelForClass, arrayProp } from '@typegoose/typegoose'
 import { omit } from 'lodash'
 
+class Comment {
+  @prop()
+  username?: string
+  @prop({ required: true })
+  text: string
+  @prop()
+  createdAt: Date
+}
+
 class LocalizationVariant {
   @prop()
   username?: string
@@ -16,6 +25,8 @@ class LocalizationVariant {
   upvotes: number
   @prop({ required: true, default: 0 })
   downvotes: number
+  @arrayProp({ items: Comment, required: true, default: [] })
+  comments: Comment[]
 }
 
 export class Localization {

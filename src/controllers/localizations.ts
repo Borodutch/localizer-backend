@@ -70,6 +70,7 @@ export default class {
               createdAt: new Date(),
               upvotes: 0,
               downvotes: 0,
+              comments: [],
             })
           }
           // Add tags if needed
@@ -254,7 +255,54 @@ export default class {
       createdAt: new Date(),
       upvotes: 0,
       downvotes: 0,
+      comments: [],
     })
+    await localization.save()
+    ctx.status = 200
+  }
+
+  @Post('/comment')
+  async commentVariant(ctx: Context) {
+    const { username, text, key, id } = ctx.request.body
+    if (!key || !id || !text) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findOne({ key })
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    for (const variant of localization.variants) {
+      if ((variant as any)._id.toString() === id) {
+        variant.comments.push({
+          username,
+          text,
+          createdAt: new Date(),
+        })
+        break
+      }
+    }
+    await localization.save()
+    ctx.status = 200
+  }
+
+  @Post('/comment/delete', checkPassword)
+  async deleteCommentVariant(ctx: Context) {
+    const { key, id, commentId } = ctx.request.body
+    if (!key || !id || !commentId) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findOne({ key })
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    for (const variant of localization.variants) {
+      if ((variant as any)._id.toString() === id) {
+        variant.comments = variant.comments.filter(
+          (c: any) => c._id.toString() !== commentId
+        )
+        break
+      }
+    }
     await localization.save()
     ctx.status = 200
   }

@@ -263,6 +263,38 @@ export default class {
     ctx.status = 200
   }
 
+  @Post('/localization/deleteTag', checkPassword)
+  async deleteLocalizationTag(ctx: Context) {
+    const { key, tag } = ctx.request.body
+    if (!key || !tag) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findOne({ key })
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    localization.tags = localization.tags.filter((t) => t !== tag)
+    await localization.save()
+    ctx.status = 200
+  }
+
+  @Post('/localization/addTag', checkPassword)
+  async addLocalizationTag(ctx: Context) {
+    const { key, tag } = ctx.request.body
+    if (!key || !tag) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findOne({ key })
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    if (localization.tags.indexOf(tag) === -1) {
+      localization.tags.push(tag)
+    }
+    await localization.save()
+    ctx.status = 200
+  }
+
   @Post('/localization')
   async postLocalization(ctx: Context) {
     const { key, text, language, username } = ctx.request.body

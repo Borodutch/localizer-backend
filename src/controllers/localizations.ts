@@ -88,43 +88,77 @@ export default class {
 
   @Post('/select', checkPassword)
   async selectVariant(ctx: Context) {
-    const { key, id } = ctx.request.body
-    if (!key || !id) {
+    let { key, id, ids } = ctx.request.body
+    if (!key || (!id && !ids)) {
       return ctx.throw(403)
     }
     const localization = await LocalizationModel.findOne({ key })
     if (!localization) {
       return ctx.throw(404)
     }
-    const variantToSelect = localization.variants.find(
-      (v: any) => v._id.toString() === id
+    if (!ids) {
+      ids = [id]
+    }
+    const variantsToSelect = localization.variants.filter(
+      (v: any) => ids.indexOf(v._id.toString()) > -1
     )
-    if (!variantToSelect) {
+    if (!variantsToSelect.length) {
       return ctx.throw(404)
     }
-    for (const variant of localization.variants) {
-      if (variant.language === variantToSelect.language) {
-        variant.selected = false
+    for (const variantToSelect of variantsToSelect) {
+      for (const variant of localization.variants) {
+        if (variant.language === variantToSelect.language) {
+          variant.selected = false
+        }
       }
     }
-    variantToSelect.selected = true
+    const selectedLanguages = {}
+    variantsToSelect.forEach((v) => {
+      if (!selectedLanguages[v.language]) {
+        v.selected = true
+        selectedLanguages[v.language] = true
+      }
+    })
     await localization.save()
     ctx.status = 200
   }
 
   @Post('/delete', checkPassword)
   async deleteVariant(ctx: Context) {
-    const { key, id } = ctx.request.body
-    if (!key || !id) {
+    let { key, id, ids } = ctx.request.body
+    if (!key || (!id && !ids)) {
       return ctx.throw(403)
     }
     const localization = await LocalizationModel.findOne({ key })
     if (!localization) {
       return ctx.throw(404)
     }
+    if (!ids) {
+      ids = [id]
+    }
     localization.variants = localization.variants.filter(
-      (v: any) => v._id.toString() !== id
+      (v: any) => ids.indexOf(v._id.toString()) === -1
     )
+    await localization.save()
+    ctx.status = 200
+  }
+
+  @Post('/edit', checkPassword)
+  async editVariant(ctx: Context) {
+    const { key, id, text } = ctx.request.body
+    if (!key || !id || !text) {
+      return ctx.throw(403)
+    }
+    const localization = await LocalizationModel.findOne({ key })
+    if (!localization) {
+      return ctx.throw(404)
+    }
+    for (const variant of localization.variants) {
+      if ((variant as any)._id.toString() === id) {
+        variant.text = text
+        break
+      }
+    }
     await localization.save()
     ctx.status = 200
   }

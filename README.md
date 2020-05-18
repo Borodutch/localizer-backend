@@ -12,6 +12,11 @@ This is the backend part of Localizer.
 
 And you should be good to go! Feel free to fork and submit pull requests. Also check out `/src/conrollers` for the API.
 
+## Run with docker compose
+
+1. Create `.env` with the environment variables listed below (exclude `MONGO`)
+2. Run `docker-compose up` or `docker-compose up -d` for daemon
+
 ## Environment variables
 
 | Name             | Description                                        |

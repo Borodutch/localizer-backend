@@ -23,7 +23,8 @@ WORKDIR /app
 
 # Копируем из билдера "чистое" приложение
 COPY --from=builder /sources/dist ./dist
-COPY --from=builder /sources/package*.json .
+COPY --from=builder /sources/package.json .
+COPY --from=builder /sources/package-lock.json .
 COPY --from=builder /sources/node_modules ./node_modules
 
 EXPOSE 1337

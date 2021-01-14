@@ -1,0 +1,5 @@
+.env
+node_modules
+*.log
+dist
+mongo-volumes

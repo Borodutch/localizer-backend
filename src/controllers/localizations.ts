@@ -301,7 +301,7 @@ export default class {
     if (!key || !text || !language) {
       return ctx.throw(403)
     }
-    const localization = await LocalizationModel.findOne({ key })
+    let localization = await LocalizationModel.findOne({ key })
     if (!localization) {
       return ctx.throw(404)
     }
@@ -323,7 +323,13 @@ export default class {
       downvotes: 0,
       comments: [],
     })
-    await localization.save()
+    localization = await localization.save()
+    ctx.body = localization.variants.find(
+      (variant) =>
+        variant.text === text &&
+        variant.language === language &&
+        variant.username === username
+    )
     ctx.status = 200
   }
 
@@ -333,7 +339,7 @@ export default class {
     if (!key || !id || !text) {
       return ctx.throw(403)
     }
-    const localization = await LocalizationModel.findOne({ key })
+    let localization = await LocalizationModel.findOne({ key })
     if (!localization) {
       return ctx.throw(404)
     }
@@ -347,7 +353,15 @@ export default class {
         break
       }
     }
-    await localization.save()
+    localization = await localization.save()
+
+    const variant = localization.variants.find(
+      (variant) => (variant as any)._id.toString() === id
+    )
+    if (variant) {
+      ctx.body = variant.comments.pop()
+    }
+
     ctx.status = 200
   }
 

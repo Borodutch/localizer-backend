@@ -1,9 +1,9 @@
 {
-  "name": "backend-starter",
-  "version": "1.0.0",
-  "description": "Backend starter template",
+  "name": "localizer-backend",
+  "version": "1.0.1",
+  "description": "Localizer backend",
   "main": "dist/app.js",
-  "repository": "https://github.com/backmeupplz/backend-starter",
+  "repository": "https://github.com/backmeupplz/localizer-backend",
   "author": "backmeupplz <backmeupplz@gmail.com>",
   "license": "MIT",
   "private": false,

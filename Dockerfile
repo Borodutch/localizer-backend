@@ -13,9 +13,6 @@ RUN npm prune --production
 # Чистка node_modules от "хлама" файлов README LICENSE etc
 RUN npx modclean --no-progress --run
 
-# Удаляем явно не нужные в проде каталоги и файлы (если их пропустил dockerignore)
-RUN rm -rf .git .github docs tests .npmrc .nvmrc .editorconfig .eslintrc .foreverignore .gitignore .dockerignore Dockerfile
-
 
 # 
 # Запуск в продакшн
@@ -25,9 +22,10 @@ FROM node:14-alpine3.10
 WORKDIR /app
 
 # Копируем из билдера "чистое" приложение
-COPY --from=builder /sources/ .
-# в данном случае к базовому образу node:14-alpine3.10 добавляется только один слой файловой системы - COPY
-# слои со всеми install, rm остаются в предыдущем, неиспользуемом образе(builder)
+COPY --from=builder /sources/dist ./dist
+COPY --from=builder /sources/package.json .
+COPY --from=builder /sources/package-lock.json .
+COPY --from=builder /sources/node_modules ./node_modules
 
 EXPOSE 1337
 
